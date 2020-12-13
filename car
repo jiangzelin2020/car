@@ -1,0 +1,95 @@
+//motor A后轮 connected between A01 and A02
+//motor B转向connected between B01 and B02
+//Xinpengmaker
+ 
+int STBY = 10; //standby
+ 
+ 
+char SerialData;
+ 
+ 
+//Motor A
+int PWMA = 3; //Speed control 
+int AIN1 = 9; //Direction
+int AIN2 = 8; //Direction
+ 
+ 
+//Motor B
+int PWMB = 5; //Speed control
+int BIN1 = 11; //Direction
+int BIN2 = 12; //Direction
+ 
+void setup(){
+  pinMode(STBY, OUTPUT);
+  
+  pinMode(PWMA, OUTPUT);
+  pinMode(AIN1, OUTPUT);
+  pinMode(AIN2, OUTPUT);
+ 
+  pinMode(PWMB, OUTPUT);
+  pinMode(BIN1, OUTPUT);
+  pinMode(BIN2, OUTPUT);
+ 
+  Serial.begin(9600);
+}
+ 
+void loop(){
+  if (Serial.available()>0){
+    SerialData = Serial.read();
+      if (SerialData == 'w' ) {  
+      Serial.print("Got command: ");  Serial.println(SerialData); 
+      move(1, 255, 0);
+       
+    }
+    else if (SerialData == 'a' ) { 
+      Serial.print("Got command: ");  Serial.println(SerialData); 
+      move(2, 255, 0); //motor 1, full speed, left
+       
+    }
+       
+    }
+            if (SerialData == 'd' ) { 
+      Serial.print("Got command: ");  Serial.println(SerialData); 
+      move(2, 255,1); //motor 1, full speed, left
+       
+    }else if (SerialData == 's' ) { 
+      Serial.print("Got command: ");  Serial.println(SerialData); 
+      move(1, 255, 1); //motor 1, full speed
+    }
+            if (SerialData == '0' ) {
+      Serial.print("Got command: ");  Serial.println(SerialData); 
+      stop();
+       
+    }
+}
+ 
+void move(int motor, int speed, int direction){
+//Move specific motor at speed and direction
+//motor: 0 for B转向 1 for A后轮
+//speed: 0 is off, and 255 is full speed
+ 
+ 
+  digitalWrite(STBY, HIGH); //disable standby
+ 
+ 
+  boolean inPin1 = LOW;
+  boolean inPin2 = HIGH;
+ 
+  if(direction == 1){
+    inPin1 = HIGH;
+    inPin2 = LOW;
+  }
+ 
+  if(motor == 1){
+    digitalWrite(AIN1, inPin1);
+    digitalWrite(AIN2, inPin2);
+    analogWrite(PWMA, speed);
+  }else{
+    digitalWrite(BIN1, inPin1);
+    digitalWrite(BIN2, inPin2);
+    analogWrite(PWMB, speed);
+  }
+}
+void stop(){ 
+  digitalWrite(STBY, LOW); 
+}
